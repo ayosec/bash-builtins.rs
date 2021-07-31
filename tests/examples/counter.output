@@ -1,0 +1,27 @@
+.
+counter: counter [-r] [-s value] [-a value]
+    Print a value, and increment it.
+    
+    Options:
+      -r	Reset the value to 0.
+      -s	Set the counter to a specific value.
+      -a	Increment the counter by a value.
+failed
+.
+counter: counter [-r] [-s value] [-a value]
+    Print a value, and increment it.
+    
+    Options:
+      -r	Reset the value to 0.
+      -s	Set the counter to a specific value.
+      -a	Increment the counter by a value.
+.
+tests/examples/counter.sh: line 13: counter: -X: invalid option
+counter: usage: counter [-r] [-s value] [-a value]
+failed
+0
+tests/examples/counter.sh: line 16: counter: too many arguments
+failed
+1
+0
+-10

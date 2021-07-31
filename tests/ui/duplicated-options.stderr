@@ -1,0 +1,5 @@
+error: duplicated option 'a'
+ --> $DIR/duplicated-options.rs:8:5
+  |
+8 |     #[opt = 'a']
+  |     ^

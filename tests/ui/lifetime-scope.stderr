@@ -1,0 +1,12 @@
+error[E0759]: `args` has an anonymous lifetime `'_` but it needs to satisfy a `'static` lifetime requirement
+  --> $DIR/lifetime-scope.rs:13:25
+   |
+12 |     fn call(&mut self, args: &mut Args) -> Result<()> {
+   |                              --------- this data with an anonymous lifetime `'_`...
+13 |         for opt in args.options() {
+   |                    ---- ^^^^^^^
+   |                    |
+   |                    ...is captured here...
+14 |             match opt? {
+15 |                 Opt::S(s) => self.0 = s,
+   |                                       - ...and is required to live as long as `'static` here

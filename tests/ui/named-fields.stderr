@@ -1,0 +1,5 @@
+error: Named fields are not supported
+ --> $DIR/named-fields.rs:8:5
+  |
+8 |     #[opt = 'b']
+  |     ^

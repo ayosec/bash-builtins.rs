@@ -1,0 +1,5 @@
+error: missing #[opt = '…'] attribute
+ --> $DIR/missing-opt.rs:8:5
+  |
+8 |     B,
+  |     ^

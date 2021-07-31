@@ -4,6 +4,38 @@ version = "0.1.0"
 edition = "2018"
 
 [dependencies]
+bash_builtins_macro = { version = "0", path = "bash_builtins_macro" }
 
-[lib]
-proc-macro = true
+[dev-dependencies]
+assert_matches = "1"
+serde_json = "1"
+trybuild = "1.0.43"
+
+[workspace]
+members = [ "bash_builtins_macro", ]
+
+# Examples
+
+[[example]]
+name = "counter"
+crate-type = [ "cdylib" ]
+
+[[example]]
+name = "canpanic"
+crate-type = [ "cdylib" ]
+
+[[example]]
+name = "filesize"
+crate-type = [ "cdylib" ]
+
+[[example]]
+name = "loadfail"
+crate-type = [ "cdylib" ]
+
+[[example]]
+name = "nonrequiredargs"
+crate-type = [ "cdylib" ]
+
+[[example]]
+name = "upcase"
+crate-type = [ "cdylib" ]

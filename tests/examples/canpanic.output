@@ -1,0 +1,6 @@
+OK
+thread '<unnamed>' panicked at 'DO PANIC', examples/canpanic.rs:14:13
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+tests/examples/canpanic.sh: line 6: canpanic: invalid internal state
+after
+OK

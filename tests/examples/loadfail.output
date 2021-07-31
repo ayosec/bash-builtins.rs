@@ -1,0 +1,2 @@
+loadfail: error: something really bad happened
+$RUNNER: line 7: enable: load function for loadfail returns failure (0): not loaded

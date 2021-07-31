@@ -1,0 +1,15 @@
+ -
+ -
+Ok(Foo(None))
+ -
+Ok(Foo(None))
+Ok(Bar(None))
+ -
+Ok(Foo(None))
+Ok(Bar(Some("bar")))
+ -
+Ok(Foo(Some(42)))
+Ok(Bar(None))
+ -
+Ok(Foo(Some(1)))
+Ok(Bar(Some("foo")))

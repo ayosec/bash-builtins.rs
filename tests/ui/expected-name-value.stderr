@@ -1,0 +1,5 @@
+error: invalid #[opt] attribute
+ --> $DIR/expected-name-value.rs:5:5
+  |
+5 |     #[opt('a')]
+  |     ^

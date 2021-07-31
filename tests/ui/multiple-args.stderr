@@ -1,0 +1,5 @@
+error: Options must have only one argument
+  --> $DIR/multiple-args.rs:11:5
+   |
+11 |     #[opt = 'c']
+   |     ^

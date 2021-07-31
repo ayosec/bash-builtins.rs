@@ -1,0 +1,5 @@
+error: #[opt] requires an ASCII alphanumeric character
+ --> $DIR/non-ascii.rs:5:5
+  |
+5 |     #[opt = 'Ω']
+  |     ^

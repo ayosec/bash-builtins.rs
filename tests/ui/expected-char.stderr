@@ -1,0 +1,5 @@
+error: #[opt = '…'] requires a character
+ --> $DIR/expected-char.rs:5:5
+  |
+5 |     #[opt = 0]
+  |     ^
