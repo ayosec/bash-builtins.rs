@@ -1,6 +1,6 @@
 [package]
 name = "bash-builtins"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2018"
 authors = [ "ayosec@gmail.com" ]
 description = "This crate provides utilities to implement loadable builtins for bash."
