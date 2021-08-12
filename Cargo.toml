@@ -2,6 +2,13 @@
 name = "bash-builtins"
 version = "0.1.0"
 edition = "2018"
+authors = [ "ayosec@gmail.com" ]
+description = "This crate provides utilities to implement loadable builtins for bash."
+documentation = "https://docs.rs/bash-builtins"
+readme = "README.md"
+repository = "https://github.com/ayosec/bash-builtins.rs"
+license = "Apache-2.0"
+keywords = ["bash"]
 
 [dependencies]
 bash_builtins_macro = { version = "0", path = "bash_builtins_macro" }
@@ -13,6 +20,7 @@ trybuild = "1.0.43"
 
 [workspace]
 members = [ "bash_builtins_macro", ]
+
 
 # Examples
 
