@@ -1,0 +1,48 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches:
+      - "*"
+
+jobs:
+  ci:
+    name: rust ${{ matrix.rust }} on ${{ matrix.os }}
+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        rust:
+          - stable
+          - beta
+          - 1.54.0
+        os:
+          - ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install Rust ${{ matrix.rust }}.
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: ${{ matrix.rust }}
+          override: true
+          components: rustfmt, clippy
+
+      - name: Run tests.
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+
+      - name: Check Clippy lints.
+        uses: actions-rs/cargo@v1
+        with:
+          command: clippy
+          args: -- -D warnings
+
+      - name: Check format.
+        uses: actions-rs/cargo@v1
+        with:
+          command: fmt
+          args: --all -- --check
