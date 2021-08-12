@@ -47,3 +47,7 @@ crate-type = [ "cdylib" ]
 [[example]]
 name = "upcase"
 crate-type = [ "cdylib" ]
+
+[[example]]
+name = "unload"
+crate-type = [ "cdylib" ]

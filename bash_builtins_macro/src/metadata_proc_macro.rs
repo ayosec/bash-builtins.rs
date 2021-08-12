@@ -167,8 +167,6 @@ pub(crate) fn macro_impl(args: TokenStream) -> TokenStream {
             name: *const ::std::os::raw::c_char
         ) {
             let _ = ::std::panic::catch_unwind(|| {
-                #global_state_init.store(false, ::std::sync::atomic::Ordering::SeqCst);
-
                 match #global_state().lock() {
                     Ok(mut lock) => { *lock = None },
 
@@ -179,6 +177,8 @@ pub(crate) fn macro_impl(args: TokenStream) -> TokenStream {
                         ::std::mem::forget(old_state);
                     },
                 };
+
+                #global_state_init.store(false, ::std::sync::atomic::Ordering::SeqCst);
             });
         }
 
