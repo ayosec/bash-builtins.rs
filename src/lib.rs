@@ -268,7 +268,7 @@ pub use args::{Args, BuiltinOptions};
 pub use errors::{Error, Result};
 
 /// The `Builtin` trait contains the implementation for a bash builtin.
-pub trait Builtin: Send {
+pub trait Builtin {
     /// Method invoked when the builtin is typed in the prompt.
     ///
     /// It returns an instance of [`Result`]. The value `Ok(())` returns the
