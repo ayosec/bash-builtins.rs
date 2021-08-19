@@ -38,7 +38,7 @@ fn parse_options() {
     assert_matches!(
         Opt::from_option(
             b'c' as _,
-            Some(&CStr::from_bytes_with_nul(b"0123\0").unwrap())
+            Some(CStr::from_bytes_with_nul(b"0123\0").unwrap())
         ),
         Ok(Opt::C("0123"))
     );
@@ -70,7 +70,7 @@ fn parse_options() {
     assert_matches!(
         Opt::from_option(
             b'f' as _,
-            Some(&CStr::from_bytes_with_nul(b"abc\0").unwrap())
+            Some(CStr::from_bytes_with_nul(b"abc\0").unwrap())
         ),
         Ok(Opt::F(Some("abc")))
     );
