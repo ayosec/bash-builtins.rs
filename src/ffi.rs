@@ -114,3 +114,35 @@ pub mod exit {
     /// Fall back to disk command from builtin.
     pub const EX_DISKFALLBACK: c_int = 262;
 }
+
+#[cfg(test)]
+mod mock_bash_symbols {
+    use std::os::raw::{c_char, c_int};
+
+    #[no_mangle]
+    extern "C" fn builtin_error(_: *const c_char) {}
+
+    #[no_mangle]
+    extern "C" fn builtin_warning(_: *const c_char) {}
+
+    #[no_mangle]
+    extern "C" fn builtin_usage() {}
+
+    #[no_mangle]
+    extern "C" fn builtin_help() {}
+
+    #[no_mangle]
+    extern "C" fn reset_internal_getopt() {}
+
+    #[no_mangle]
+    extern "C" fn sh_needarg(_: *const c_char) {}
+
+    #[no_mangle]
+    static mut list_opttype: c_int = 0;
+
+    #[no_mangle]
+    static mut list_optopt: c_int = 0;
+
+    #[no_mangle]
+    static mut list_optarg: *const c_char = std::ptr::null();
+}

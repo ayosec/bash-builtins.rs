@@ -171,10 +171,7 @@ impl Args {
     pub fn raw_arguments(&mut self) -> impl Iterator<Item = &'_ CStr> {
         self.ensure_reset();
 
-        WordListIterator {
-            current: self.word_list,
-            phantom: PhantomData,
-        }
+        WordListIterator(self)
     }
 
     /// Like [`raw_arguments`], but items are [`Path`] instances.
@@ -329,22 +326,19 @@ impl Args {
     }
 }
 
-struct WordListIterator<'a> {
-    current: *const ffi::WordList,
-    phantom: PhantomData<&'a Args>,
-}
+struct WordListIterator<'a>(&'a mut Args);
 
 impl<'a> Iterator for WordListIterator<'a> {
     type Item = &'a CStr;
 
     fn next(&mut self) -> Option<Self::Item> {
-        if self.current.is_null() {
+        if self.0.word_list.is_null() {
             return None;
         }
 
         let word = unsafe {
-            let current = &*self.current;
-            self.current = current.next;
+            let current = &*self.0.word_list;
+            self.0.word_list = current.next;
             CStr::from_ptr((*current.word).word)
         };
 
@@ -396,5 +390,45 @@ impl<'a, T> OptionsIterator<'a, T> {
         } else {
             Some(::std::ffi::CStr::from_ptr(optarg))
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use ffi::{WordDesc, WordList};
+
+    #[test]
+    fn update_word_list_after_arguments() {
+        let words = [
+            WordDesc {
+                word: b"abc\0".as_ptr().cast(),
+                flags: 0,
+            },
+            WordDesc {
+                word: b"def\0".as_ptr().cast(),
+                flags: 0,
+            },
+        ];
+
+        let wl1 = WordList {
+            word: &words[1],
+            next: std::ptr::null(),
+        };
+
+        let wl0 = WordList {
+            word: &words[0],
+            next: &wl1,
+        };
+
+        let mut args = unsafe { Args::new(&wl0) };
+
+        let mut string_args = args.string_arguments();
+        assert_eq!(string_args.next(), Some(Ok("abc")));
+        assert_eq!(string_args.next(), Some(Ok("def")));
+        assert_eq!(string_args.next(), None);
+        drop(string_args);
+
+        args.finished().unwrap();
     }
 }
