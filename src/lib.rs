@@ -228,6 +228,32 @@
 //! Use [`Error::ExitCode`] to return a specific exit code. See the [`Error`]
 //! documentation for more details.
 //!
+//! # Using Shell Variables
+//!
+//! The module [`variables`] contains functions to manage the shell variables.
+//!
+//! ## Example
+//!
+//! The following example uses the variable `$SOMENAME_LIMIT` to set the
+//! configuration value for the builtin. If it is not present, or its value is
+//! not a valid `usize`, it uses a default value
+//!
+//! ```
+//! use bash_builtins::variables;
+//!
+//! const DEFAULT_LIMIT: usize = 1024;
+//!
+//! const VAR_LIMIT: &str = "SOMENAME_LIMIT";
+//!
+//! fn get_limit() -> usize {
+//!     variables::find_as_string(VAR_LIMIT)
+//!         .as_ref()
+//!         .and_then(|v| v.to_str().ok())
+//!         .and_then(|v| v.parse().ok())
+//!         .unwrap_or(DEFAULT_LIMIT)
+//! }
+//! ```
+//!
 //! # Panic Handling
 //!
 //! Panics are captured with [`panic::catch_unwind`], so they should not reach
@@ -256,6 +282,7 @@ mod errors;
 
 pub mod convert;
 pub mod log;
+pub mod variables;
 
 #[doc(hidden)]
 pub mod ffi;

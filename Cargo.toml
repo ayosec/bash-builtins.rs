@@ -51,3 +51,7 @@ crate-type = [ "cdylib" ]
 [[example]]
 name = "unload"
 crate-type = [ "cdylib" ]
+
+[[example]]
+name = "usevars"
+crate-type = [ "cdylib" ]
