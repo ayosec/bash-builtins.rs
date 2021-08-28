@@ -29,7 +29,7 @@ impl Builtin for UseVars {
                 }
 
                 (Some(name), Some(value)) => {
-                    variables::set_value(&name, &value)?;
+                    variables::set(&name, &value)?;
                 }
 
                 _ => (),

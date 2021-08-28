@@ -58,22 +58,32 @@ extern "C" {
     pub(crate) fn builtin_usage();
     pub(crate) fn builtin_help();
 
+    pub(crate) fn internal_error(_: *const c_char, ...);
 }
 
 pub(crate) mod variables {
-    use std::os::raw::{c_char, c_int, c_uint, c_void};
+    use std::os::raw::{c_char, c_int, c_uint};
 
     // Flags for the `attributes` field.
     pub const ATT_ARRAY: c_int = 0x0000004;
     pub const ATT_ASSOC: c_int = 0x0000040;
 
+    type VarValueFn = unsafe extern "C" fn(*mut ShellVar) -> *const ShellVar;
+
+    type VarAssignFn = unsafe extern "C" fn(
+        *mut ShellVar,
+        *const c_char,
+        libc::intmax_t,
+        *const c_char,
+    ) -> *const ShellVar;
+
     #[repr(C)]
     pub struct ShellVar {
         pub name: *const c_char,
-        pub value: *const c_char,
+        pub value: *mut c_char,
         pub exportstr: *const c_char,
-        pub dynamic_value: *const c_void,
-        pub assign_func: *const c_void,
+        pub dynamic_value: VarValueFn,
+        pub assign_func: VarAssignFn,
         pub attributes: c_int,
         pub context: c_int,
     }
@@ -83,7 +93,7 @@ pub(crate) mod variables {
     #[repr(C)]
     pub struct Array {
         pub atype: c_int,
-        pub max_index: i64,
+        pub max_index: libc::intmax_t,
         pub num_elements: c_int,
         pub head: *const ArrayElement,
         pub lastref: *const ArrayElement,
@@ -91,7 +101,7 @@ pub(crate) mod variables {
 
     #[repr(C)]
     pub struct ArrayElement {
-        pub ind: i64,
+        pub ind: libc::intmax_t,
         pub value: *const c_char,
         pub next: *const ArrayElement,
         pub prev: *const ArrayElement,
@@ -117,7 +127,7 @@ pub(crate) mod variables {
     extern "C" {
         pub fn find_variable(_: *const c_char) -> *const ShellVar;
         pub fn legal_identifier(_: *const c_char) -> c_int;
-        pub fn bind_variable(_: *const c_char, _: *const c_char, _: c_int) -> *const ShellVar;
+        pub fn bind_variable(_: *const c_char, _: *const c_char, _: c_int) -> *mut ShellVar;
         pub fn unbind_variable(_: *const c_char) -> c_int;
     }
 }

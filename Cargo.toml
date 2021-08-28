@@ -11,6 +11,7 @@ license = "Apache-2.0"
 keywords = ["bash"]
 
 [dependencies]
+libc = "*"
 bash_builtins_macro = { version = "0", path = "bash_builtins_macro" }
 
 [dev-dependencies]
@@ -54,4 +55,8 @@ crate-type = [ "cdylib" ]
 
 [[example]]
 name = "usevars"
+crate-type = [ "cdylib" ]
+
+[[example]]
+name = "varcounter"
 crate-type = [ "cdylib" ]

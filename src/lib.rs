@@ -243,16 +243,24 @@
 //!
 //! const DEFAULT_LIMIT: usize = 1024;
 //!
-//! const VAR_LIMIT: &str = "SOMENAME_LIMIT";
+//! const LIMIT_VAR_NAME: &str = "SOMENAME_LIMIT";
 //!
 //! fn get_limit() -> usize {
-//!     variables::find_as_string(VAR_LIMIT)
+//!     variables::find_as_string(LIMIT_VAR_NAME)
 //!         .as_ref()
 //!         .and_then(|v| v.to_str().ok())
 //!         .and_then(|v| v.parse().ok())
 //!         .unwrap_or(DEFAULT_LIMIT)
 //! }
 //! ```
+//!
+//! # Creating Dynamic Variables
+//!
+//! Dynamic variables are shell variables that use custom functions each time
+//! they are accessed (like `$SECONDS` or `$RANDOM`).
+//!
+//! Use [`variables::bind`] to create a dynamic variable with any type
+//! implementing [`DynamicVariable`](variables::DynamicVariable).
 //!
 //! # Panic Handling
 //!
