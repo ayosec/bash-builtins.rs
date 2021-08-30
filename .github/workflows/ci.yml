@@ -35,6 +35,22 @@ jobs:
         with:
           command: test
 
+      - name: Test with valgrind.
+        run: |
+          set -xe
+
+          sudo apt-get update
+          sudo apt-get install -y valgrind
+
+          cargo build --examples
+
+          for TEST in tests/examples/*.sh
+          do
+            export TEST_FILE_PATH="$TEST"
+            valgrind --error-exitcode=1 \
+              bash target/examples/bash-builtins/init.sh
+          done
+
       - name: Check Clippy lints.
         uses: actions-rs/cargo@v1
         with:

@@ -58,6 +58,78 @@ extern "C" {
     pub(crate) fn builtin_usage();
     pub(crate) fn builtin_help();
 
+    pub(crate) fn internal_error(_: *const c_char, ...);
+}
+
+pub(crate) mod variables {
+    use std::os::raw::{c_char, c_int, c_uint};
+
+    // Flags for the `attributes` field.
+    pub const ATT_ARRAY: c_int = 0x0000004;
+    pub const ATT_ASSOC: c_int = 0x0000040;
+
+    type VarValueFn = unsafe extern "C" fn(*mut ShellVar) -> *const ShellVar;
+
+    type VarAssignFn = unsafe extern "C" fn(
+        *mut ShellVar,
+        *const c_char,
+        libc::intmax_t,
+        *const c_char,
+    ) -> *const ShellVar;
+
+    #[repr(C)]
+    pub struct ShellVar {
+        pub name: *const c_char,
+        pub value: *mut c_char,
+        pub exportstr: *const c_char,
+        pub dynamic_value: VarValueFn,
+        pub assign_func: VarAssignFn,
+        pub attributes: c_int,
+        pub context: c_int,
+    }
+
+    // Arrays.
+
+    #[repr(C)]
+    pub struct Array {
+        pub atype: c_int,
+        pub max_index: libc::intmax_t,
+        pub num_elements: c_int,
+        pub head: *const ArrayElement,
+        pub lastref: *const ArrayElement,
+    }
+
+    #[repr(C)]
+    pub struct ArrayElement {
+        pub ind: libc::intmax_t,
+        pub value: *const c_char,
+        pub next: *const ArrayElement,
+        pub prev: *const ArrayElement,
+    }
+
+    // Associative arrays.
+
+    #[repr(C)]
+    pub struct BucketContents {
+        pub next: *const BucketContents,
+        pub key: *const c_char,
+        pub data: *const c_char,
+        pub khash: c_uint,
+        pub times_found: c_int,
+    }
+
+    pub struct HashTable {
+        pub bucket_array: *const *const BucketContents,
+        pub nbuckets: c_int,
+        pub nentries: c_int,
+    }
+
+    extern "C" {
+        pub fn find_variable(_: *const c_char) -> *const ShellVar;
+        pub fn legal_identifier(_: *const c_char) -> c_int;
+        pub fn bind_variable(_: *const c_char, _: *const c_char, _: c_int) -> *mut ShellVar;
+        pub fn unbind_variable(_: *const c_char) -> c_int;
+    }
 }
 
 /// Flags for the `BashBuiltin` struct.
@@ -73,7 +145,7 @@ pub mod flags {
     /// This builtin is not dynamically loaded.
     pub const STATIC_BUILTIN: c_int = 0x04;
 
-    /// This is a Posix `special' builtin.
+    /// This is a Posix `special` builtin.
     pub const SPECIAL_BUILTIN: c_int = 0x08;
 
     /// This builtin takes assignment statements.
