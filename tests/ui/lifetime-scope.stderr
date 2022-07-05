@@ -6,7 +6,7 @@ error[E0759]: `args` has an anonymous lifetime `'_` but it needs to satisfy a `'
 13 |         for opt in args.options() {
    |                    ---- ^^^^^^^
    |                    |
-   |                    ...is captured here...
+   |                    ...is used here...
 14 |             match opt? {
 15 |                 Opt::S(s) => self.0 = s,
    |                                       - ...and is required to live as long as `'static` here
