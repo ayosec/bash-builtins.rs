@@ -26,7 +26,7 @@ impl Builtin for VarCounter {
         args.no_options()?;
 
         for name in args.string_arguments() {
-            variables::bind(&name?, Counter(0))?;
+            variables::bind(name?, Counter(0))?;
         }
 
         Ok(())

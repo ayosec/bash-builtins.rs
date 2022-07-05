@@ -23,16 +23,16 @@ impl Builtin for UseVars {
                 },
 
                 (Some(name), Some("")) => {
-                    if variables::unset(&name) {
+                    if variables::unset(name) {
                         writeln!(&mut output, "unset: {}", name)?;
                     }
                 }
 
                 (Some(name), Some(value)) => {
                     if name.contains('[') {
-                        set_array(&name, &value)?;
+                        set_array(name, value)?;
                     } else {
-                        variables::set(&name, &value)?;
+                        variables::set(name, value)?;
                     }
                 }
 
