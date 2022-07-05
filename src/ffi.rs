@@ -125,10 +125,28 @@ pub(crate) mod variables {
     }
 
     extern "C" {
-        pub fn find_variable(_: *const c_char) -> *const ShellVar;
+        pub fn find_variable(_: *const c_char) -> *mut ShellVar;
         pub fn legal_identifier(_: *const c_char) -> c_int;
+
         pub fn bind_variable(_: *const c_char, _: *const c_char, _: c_int) -> *mut ShellVar;
         pub fn unbind_variable(_: *const c_char) -> c_int;
+
+        pub fn bind_array_variable(
+            _: *const c_char,
+            _: libc::intmax_t,
+            _: *const c_char,
+            _: c_int,
+        ) -> *mut ShellVar;
+
+        pub fn bind_assoc_variable(
+            _: *mut ShellVar,
+            _: *const c_char,
+            _: *const c_char,
+            _: *const c_char,
+            _: c_int,
+        ) -> *mut ShellVar;
+
+        pub fn make_new_assoc_variable(_: *const c_char) -> *mut ShellVar;
     }
 }
 

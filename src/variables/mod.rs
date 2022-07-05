@@ -45,8 +45,11 @@ use std::os::raw::c_char;
 use std::ptr::NonNull;
 
 mod arrays;
+mod assoc;
 mod dynvars;
 
+pub use arrays::array_set;
+pub use assoc::assoc_set;
 pub use dynvars::DynamicVariable;
 
 /// Returns a string with the value of the shell variable `name`.
@@ -146,6 +149,7 @@ pub fn bind(name: &str, dynvar: impl DynamicVariable + 'static) -> Result<(), Va
 pub enum VariableError {
     InvalidName,
     InvalidValue,
+    NotAssocArray,
     InternalError(&'static str),
 }
 
@@ -154,6 +158,7 @@ impl fmt::Display for VariableError {
         match self {
             VariableError::InvalidName => fmt.write_str("invalid variable name"),
             VariableError::InvalidValue => fmt.write_str("invalid variable value"),
+            VariableError::NotAssocArray => fmt.write_str("variable is not an associative array"),
             VariableError::InternalError(cause) => write!(fmt, "internal error: {}", cause),
         }
     }
@@ -313,6 +318,6 @@ impl RawVariable {
     ///   array.
     pub unsafe fn assoc_items(&self) -> impl Iterator<Item = (*const c_char, *const c_char)> + '_ {
         let table = &*(self.0.as_ref().value as *const ffi::HashTable);
-        arrays::AssocItemsIterator::new(table)
+        assoc::AssocItemsIterator::new(table)
     }
 }

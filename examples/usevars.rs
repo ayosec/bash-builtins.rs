@@ -29,7 +29,11 @@ impl Builtin for UseVars {
                 }
 
                 (Some(name), Some(value)) => {
-                    variables::set(&name, &value)?;
+                    if name.contains('[') {
+                        set_array(&name, &value)?;
+                    } else {
+                        variables::set(&name, &value)?;
+                    }
                 }
 
                 _ => (),
@@ -55,6 +59,24 @@ fn write_var(mut output: impl Write, name: &str, var: Variable) -> io::Result<()
                 writeln!(&mut output, "{}[{:?}] = {:?}", name, key, value)?;
             }
         }
+    }
+
+    Ok(())
+}
+
+fn set_array(name: &str, value: &str) -> Result<()> {
+    let (open, close) = match (name.find('['), name.find(']')) {
+        (Some(a), Some(b)) if b + 1 == name.len() => (a, b),
+        _ => return Ok(()),
+    };
+
+    let var_name = &name[..open];
+    let key = &name[open + 1..close];
+
+    if let Ok(index) = key.parse() {
+        variables::array_set(var_name, index, value)?;
+    } else {
+        variables::assoc_set(var_name, key, value)?;
     }
 
     Ok(())

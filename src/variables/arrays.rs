@@ -1,8 +1,37 @@
-//! Iterators to get array items.
+//! Access to array variables.
 
+use super::VariableError;
 use crate::ffi::variables as ffi;
 use std::convert::TryFrom;
+use std::ffi::CString;
 use std::os::raw::c_char;
+
+/// Change an element of the array contained in the shell variable referenced by
+/// `name`.
+///
+/// `value` is not required to be valid UTF-8, but it can't contain any nul
+/// byte.
+pub fn array_set<T>(name: &str, index: usize, value: T) -> Result<(), VariableError>
+where
+    T: AsRef<[u8]>,
+{
+    let name = CString::new(name).map_err(|_| VariableError::InvalidName)?;
+    let value = CString::new(value.as_ref()).map_err(|_| VariableError::InvalidValue)?;
+
+    let res = unsafe {
+        if ffi::legal_identifier(name.as_ptr()) == 0 {
+            return Err(VariableError::InvalidName);
+        }
+
+        ffi::bind_array_variable(name.as_ptr(), index as _, value.as_ptr(), 0)
+    };
+
+    if res.is_null() {
+        Err(VariableError::InvalidValue)
+    } else {
+        Ok(())
+    }
+}
 
 /// Iterator to get items in an indexed array.
 pub(super) struct ArrayItemsIterator<'a> {
@@ -38,48 +67,5 @@ impl Iterator for ArrayItemsIterator<'_> {
         let value = current.value;
         self.elem = current.next;
         Some(value)
-    }
-}
-
-/// Iterator to get items in an associative array.
-pub(super) struct AssocItemsIterator<'a> {
-    table: &'a ffi::HashTable,
-    num_bucket: isize,
-    current_bucket_item: Option<*const ffi::BucketContents>,
-}
-
-impl AssocItemsIterator<'_> {
-    pub(super) unsafe fn new(table: &ffi::HashTable) -> AssocItemsIterator {
-        AssocItemsIterator {
-            table,
-            num_bucket: 0,
-            current_bucket_item: None,
-        }
-    }
-}
-
-impl Iterator for AssocItemsIterator<'_> {
-    type Item = (*const c_char, *const c_char);
-
-    fn next(&mut self) -> Option<Self::Item> {
-        while self.num_bucket < self.table.nbuckets as isize {
-            let bucket = self
-                .current_bucket_item
-                .take()
-                .unwrap_or_else(|| unsafe { *self.table.bucket_array.offset(self.num_bucket) });
-
-            if !bucket.is_null() {
-                unsafe {
-                    let bucket = &*bucket;
-                    let item = ((*bucket).key, (*bucket).data);
-                    self.current_bucket_item = Some((*bucket).next);
-                    return Some(item);
-                }
-            }
-
-            self.num_bucket += 1;
-        }
-
-        None
     }
 }
