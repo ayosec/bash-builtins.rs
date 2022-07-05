@@ -255,12 +255,10 @@ impl RawVariable {
         }
 
         if self.is_assoc() {
-            let items = self
-                .assoc_items()
-                .map(|(k, v)| unsafe { (cstr(k), cstr(v)) });
+            let items = self.assoc_items().map(|(k, v)| (cstr(k), cstr(v)));
             Variable::Assoc(items.collect())
         } else if self.is_array() {
-            let items = self.array_items().map(|p| unsafe { cstr(p) });
+            let items = self.array_items().map(|p| cstr(p));
             Variable::Array(items.collect())
         } else {
             Variable::Str(cstr(self.0.as_ref().value))
