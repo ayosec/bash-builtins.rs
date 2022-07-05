@@ -129,6 +129,7 @@ fn check_examples() {
 
         let bash = Command::new("bash")
             .env("LC_ALL", "C")
+            .env("MALLOC_CHECK_", "2")
             .env(TEST_FILE_VAR, &path)
             .stdin(Stdio::null())
             .stdout(Stdio::piped())
