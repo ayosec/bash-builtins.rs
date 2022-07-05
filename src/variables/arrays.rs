@@ -14,7 +14,7 @@ impl ArrayItemsIterator<'_> {
     pub(super) unsafe fn new(array: &ffi::Array) -> ArrayItemsIterator {
         ArrayItemsIterator {
             array,
-            elem: (*array.lastref).next,
+            elem: (*array.head).next,
         }
     }
 }
@@ -30,7 +30,7 @@ impl Iterator for ArrayItemsIterator<'_> {
     }
 
     fn next(&mut self) -> Option<Self::Item> {
-        if self.elem == self.array.lastref {
+        if self.elem == self.array.head {
             return None;
         }
 
