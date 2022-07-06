@@ -7,6 +7,12 @@
 //! and both [`find`] and [`find_as_string`] provides a safe interface to such
 //! value.
 //!
+//! Use [`array_set`] and [`array_get`] to access the elements in an indexed
+//! array.
+//!
+//! Use [`assoc_get`] and [`assoc_get`] to access the elements in an associative
+//! array.
+//!
 //! ## Example
 //!
 //! The following example uses the shell variable `$SOMENAME_LIMIT` to set the
@@ -48,8 +54,8 @@ mod arrays;
 mod assoc;
 mod dynvars;
 
-pub use arrays::array_set;
-pub use assoc::assoc_set;
+pub use arrays::{array_get, array_set};
+pub use assoc::{assoc_get, assoc_set};
 pub use dynvars::DynamicVariable;
 
 /// Returns a string with the value of the shell variable `name`.
@@ -263,7 +269,7 @@ impl RawVariable {
             let items = self.assoc_items().map(|(k, v)| (cstr(k), cstr(v)));
             Variable::Assoc(items.collect())
         } else if self.is_array() {
-            let items = self.array_items().map(|p| cstr(p));
+            let items = self.array_items().map(|(_, s)| cstr(s));
             Variable::Array(items.collect())
         } else {
             Variable::Str(cstr(self.0.as_ref().value))
@@ -300,7 +306,7 @@ impl RawVariable {
     /// * It does not check that the address of the shell variable is still
     ///   valid.
     /// * It does not check that the shell variable contains an indexed array.
-    pub unsafe fn array_items(&self) -> impl Iterator<Item = *const c_char> + '_ {
+    pub unsafe fn array_items(&self) -> impl Iterator<Item = (libc::intmax_t, *const c_char)> + '_ {
         let array = &*(self.0.as_ref().value as *const ffi::Array);
         arrays::ArrayItemsIterator::new(array)
     }

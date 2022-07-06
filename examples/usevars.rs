@@ -1,7 +1,7 @@
 //! Bash builtin to access shell variables.
 
 use bash_builtins::variables::{self, Variable};
-use bash_builtins::{builtin_metadata, Args, Builtin, Result};
+use bash_builtins::{builtin_metadata, Args, Builtin, Error, Result};
 use std::io::{self, BufWriter, Write};
 
 builtin_metadata!(name = "usevars", create = UseVars::default);
@@ -17,10 +17,16 @@ impl Builtin for UseVars {
         for name in args.string_arguments() {
             let mut name_parts = name?.splitn(2, '=');
             match (name_parts.next(), name_parts.next()) {
-                (Some(name), None) => match variables::find(name) {
-                    Some(var) => write_var(&mut output, name, var)?,
-                    None => (),
-                },
+                (Some(name), None) => {
+                    if name.contains('[') {
+                        get_array(name)?;
+                    } else {
+                        match variables::find(name) {
+                            Some(var) => write_var(&mut output, name, var)?,
+                            None => (),
+                        }
+                    }
+                }
 
                 (Some(name), Some("")) => {
                     if variables::unset(name) {
@@ -64,14 +70,34 @@ fn write_var(mut output: impl Write, name: &str, var: Variable) -> io::Result<()
     Ok(())
 }
 
-fn set_array(name: &str, value: &str) -> Result<()> {
+fn parse_array_ref(name: &str) -> Result<(&str, &str)> {
     let (open, close) = match (name.find('['), name.find(']')) {
         (Some(a), Some(b)) if b + 1 == name.len() => (a, b),
-        _ => return Ok(()),
+        _ => Err(Error::Usage)?,
     };
 
     let var_name = &name[..open];
     let key = &name[open + 1..close];
+
+    Ok((var_name, key))
+}
+
+fn get_array(name: &str) -> Result<()> {
+    let (var_name, key) = parse_array_ref(name)?;
+
+    let value = if let Ok(index) = key.parse() {
+        variables::array_get(var_name, index)
+    } else {
+        variables::assoc_get(var_name, key)
+    };
+
+    println!("{name} = {value:?}");
+
+    Ok(())
+}
+
+fn set_array(name: &str, value: &str) -> Result<()> {
+    let (var_name, key) = parse_array_ref(name)?;
 
     if let Ok(index) = key.parse() {
         variables::array_set(var_name, index, value)?;

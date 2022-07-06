@@ -3,7 +3,7 @@
 use super::VariableError;
 use crate::ffi::variables as ffi;
 use std::convert::TryFrom;
-use std::ffi::CString;
+use std::ffi::{CStr, CString};
 use std::os::raw::c_char;
 
 /// Change an element of the array contained in the shell variable referenced by
@@ -33,6 +33,25 @@ where
     }
 }
 
+/// Returns a copy of the value corresponding to an element in the array.
+pub fn array_get(name: &str, index: usize) -> Option<CString> {
+    let index = index as libc::intmax_t;
+    let var = super::find_raw(name)?;
+
+    unsafe {
+        if !var.is_array() {
+            return None;
+        }
+
+        let value = var
+            .array_items()
+            .find(|&(i, _)| i == index)
+            .map(|(_, s)| CStr::from_ptr(s).to_owned());
+
+        value
+    }
+}
+
 /// Iterator to get items in an indexed array.
 pub(super) struct ArrayItemsIterator<'a> {
     array: &'a ffi::Array,
@@ -49,7 +68,7 @@ impl ArrayItemsIterator<'_> {
 }
 
 impl Iterator for ArrayItemsIterator<'_> {
-    type Item = *const c_char;
+    type Item = (libc::intmax_t, *const c_char);
 
     fn size_hint(&self) -> (usize, Option<usize>) {
         match usize::try_from(self.array.num_elements) {
@@ -66,6 +85,6 @@ impl Iterator for ArrayItemsIterator<'_> {
         let current = unsafe { &(*self.elem) };
         let value = current.value;
         self.elem = current.next;
-        Some(value)
+        Some((current.ind, value))
     }
 }

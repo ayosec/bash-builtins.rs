@@ -2,7 +2,7 @@
 
 use super::VariableError;
 use crate::ffi::variables as ffi;
-use std::ffi::CString;
+use std::ffi::{CStr, CString};
 use std::os::raw::c_char;
 
 /// Returns a pointer to a C-string with the contents of `bytes`. `bytes` can't
@@ -54,6 +54,25 @@ where
         Err(VariableError::InvalidValue)
     } else {
         Ok(())
+    }
+}
+
+/// Returns a copy of the value corresponding to a key in an associative array.
+pub fn assoc_get<T: AsRef<[u8]>>(name: &str, key: T) -> Option<CString> {
+    let key = key.as_ref();
+    let var = super::find_raw(name)?;
+
+    unsafe {
+        if !var.is_assoc() {
+            return None;
+        }
+
+        let value = var
+            .assoc_items()
+            .find(|&(k, _)| libc::strncmp(key.as_ptr().cast(), k, key.len()) == 0)
+            .map(|(_, s)| CStr::from_ptr(s).to_owned());
+
+        value
     }
 }
 

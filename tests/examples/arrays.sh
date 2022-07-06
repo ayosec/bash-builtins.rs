@@ -9,13 +9,14 @@ load_example usevars
 RED=(A B C)
 
 usevars 'RED[1]=X'
+usevars 'RED[2]' 'RED[3]'
 declare -p RED
 
 # Associative arrays.
 
 usevars 'GREEN[abc]=X'
 
-usevars GREEN
+usevars GREEN 'GREEN[abc]' 'GREEN[def]'
 declare -p GREEN
 unset GREEN
 

@@ -1,4 +1,8 @@
+RED[2] = Some("C")
+RED[3] = None
 declare -a RED=([0]="A" [1]="X" [2]="C")
+GREEN[abc] = Some("X")
+GREEN[def] = None
 GREEN["abc"] = "X"
 declare -A GREEN=([abc]="X" )
 declare -A GREEN=([B]="Y" [Xyz]="AAA" )
