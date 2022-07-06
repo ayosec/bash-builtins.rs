@@ -5,7 +5,7 @@ GREEN[abc] = Some("X")
 GREEN[def] = None
 GREEN["abc"] = "X"
 declare -A GREEN=([abc]="X" )
-declare -A GREEN=([B]="Y" [Xyz]="AAA" )
+Y AAA
 unset: RED
 EMPTY
 EMPTY

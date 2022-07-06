@@ -23,7 +23,7 @@ unset GREEN
 declare -A GREEN
 GREEN[B]=Y
 usevars 'GREEN[Xyz]=AAA'
-declare -p GREEN
+echo "${GREEN[B]} ${GREEN[Xyz]}"
 
 # Unset.
 
