@@ -47,6 +47,8 @@ extern "C" {
     pub(crate) static mut list_optopt: c_int;
     pub(crate) static mut loptend: *const WordList;
 
+    pub(crate) fn shell_version_string() -> *const c_char;
+
     pub(crate) fn internal_getopt(_: *const WordList, _: *const c_char) -> c_int;
     pub(crate) fn reset_internal_getopt();
 

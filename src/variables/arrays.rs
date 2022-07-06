@@ -5,6 +5,7 @@ use crate::ffi::variables as ffi;
 use std::convert::TryFrom;
 use std::ffi::{CStr, CString};
 use std::os::raw::c_char;
+use std::sync::Once;
 
 /// Change an element of the array contained in the shell variable referenced by
 /// `name`.
@@ -52,6 +53,30 @@ pub fn array_get(name: &str, index: usize) -> Option<CString> {
     }
 }
 
+/// Get the field to iterate over an array. The offset of this field
+/// [was changed][change] in Bash 5.1.
+///
+/// [change]: https://git.savannah.gnu.org/cgit/bash.git/commit/array.h?id=8868edaf2250e09c4e9a1c75ffe3274f28f38581
+fn array_head(array: &ffi::Array) -> *const ffi::ArrayElement {
+    static mut IS_5_0: bool = false;
+    static INIT: Once = Once::new();
+
+    let is_5_0 = unsafe {
+        INIT.call_once(|| {
+            let shver = CStr::from_ptr(crate::ffi::shell_version_string());
+            IS_5_0 = shver.to_bytes().starts_with(b"5.0.".as_ref());
+        });
+
+        IS_5_0
+    };
+
+    if is_5_0 {
+        array.lastref
+    } else {
+        array.head
+    }
+}
+
 /// Iterator to get items in an indexed array.
 pub(super) struct ArrayItemsIterator<'a> {
     array: &'a ffi::Array,
@@ -62,7 +87,7 @@ impl ArrayItemsIterator<'_> {
     pub(super) unsafe fn new(array: &ffi::Array) -> ArrayItemsIterator {
         ArrayItemsIterator {
             array,
-            elem: (*array.head).next,
+            elem: (*array_head(array)).next,
         }
     }
 }
@@ -78,7 +103,7 @@ impl Iterator for ArrayItemsIterator<'_> {
     }
 
     fn next(&mut self) -> Option<Self::Item> {
-        if self.elem == self.array.head {
+        if self.elem == array_head(self.array) {
             return None;
         }
 
