@@ -91,7 +91,7 @@ fn get_array(name: &str) -> Result<()> {
         variables::assoc_get(var_name, key)
     };
 
-    println!("{name} = {value:?}");
+    println!("{} = {:?}", name, value);
 
     Ok(())
 }
