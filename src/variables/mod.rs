@@ -48,7 +48,13 @@ use std::collections::HashMap;
 use std::ffi::{CStr, CString};
 use std::fmt;
 use std::os::raw::c_char;
-use std::ptr::NonNull;
+use std::ptr::{null, NonNull};
+use std::process::ExitStatus;
+
+
+#[cfg(unix)]
+use std::os::unix::process::ExitStatusExt;
+
 
 mod arrays;
 mod assoc;
@@ -148,6 +154,16 @@ pub fn unset(name: &str) -> bool {
 /// dynamic variable.
 pub fn bind(name: &str, dynvar: impl DynamicVariable + 'static) -> Result<(), VariableError> {
     dynvars::bind_dynvar(name, Box::new(dynvar) as Box<dyn DynamicVariable>)
+}
+
+/// Return a copy of the last command's exit status.
+#[cfg(unix)]
+pub fn get_last_exit_status() -> ExitStatus {
+    let raw_exit_code = unsafe {
+        ffi::get_exitstat(null())
+    };
+
+    ExitStatus::from_raw(raw_exit_code)
 }
 
 /// An error from a shell variable operation, like [`set`] or [`bind`].

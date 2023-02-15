@@ -65,6 +65,7 @@ extern "C" {
 
 pub(crate) mod variables {
     use std::os::raw::{c_char, c_int, c_uint};
+    use super::WordList;
 
     // Flags for the `attributes` field.
     pub const ATT_ARRAY: c_int = 0x0000004;
@@ -149,6 +150,8 @@ pub(crate) mod variables {
         ) -> *mut ShellVar;
 
         pub fn make_new_assoc_variable(_: *const c_char) -> *mut ShellVar;
+
+        pub fn get_exitstat(_: *const WordList) -> c_int;
     }
 }
 
