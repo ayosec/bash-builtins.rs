@@ -48,13 +48,11 @@ use std::collections::HashMap;
 use std::ffi::{CStr, CString};
 use std::fmt;
 use std::os::raw::c_char;
-use std::ptr::{null, NonNull};
 use std::process::ExitStatus;
-
+use std::ptr::{null, NonNull};
 
 #[cfg(unix)]
 use std::os::unix::process::ExitStatusExt;
-
 
 mod arrays;
 mod assoc;
@@ -159,9 +157,7 @@ pub fn bind(name: &str, dynvar: impl DynamicVariable + 'static) -> Result<(), Va
 /// Return a copy of the last command's exit status.
 #[cfg(unix)]
 pub fn get_last_exit_status() -> ExitStatus {
-    let raw_exit_code = unsafe {
-        ffi::get_exitstat(null())
-    };
+    let raw_exit_code = unsafe { ffi::get_exitstat(null()) };
 
     ExitStatus::from_raw(raw_exit_code)
 }

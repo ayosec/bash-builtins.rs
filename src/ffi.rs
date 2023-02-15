@@ -64,8 +64,8 @@ extern "C" {
 }
 
 pub(crate) mod variables {
-    use std::os::raw::{c_char, c_int, c_uint};
     use super::WordList;
+    use std::os::raw::{c_char, c_int, c_uint};
 
     // Flags for the `attributes` field.
     pub const ATT_ARRAY: c_int = 0x0000004;
