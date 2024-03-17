@@ -285,6 +285,8 @@
 //! [`panic` setting]: https://doc.rust-lang.org/cargo/reference/profiles.html#panic
 //! [`BuiltinOptions`]: bash_builtins_macro::BuiltinOptions
 
+#![cfg_attr(docsrs, feature(doc_cfg))]
+
 mod args;
 mod errors;
 
