@@ -14,11 +14,11 @@ use serde_json as json;
 const TEST_FILE_VAR: &str = "TEST_FILE_PATH";
 
 macro_rules! check_output {
-    ($output:expr) => {
+    ($path: expr, $output:expr) => {
         if !$output.status.success() {
             std::io::stdout().write_all(&$output.stdout).unwrap();
             std::io::stderr().write_all(&$output.stderr).unwrap();
-            panic!("command failed");
+            panic!("{:?} failed: {:?}", $path, $output.status);
         }
     };
 }
@@ -36,7 +36,7 @@ fn build_examples() -> Vec<(String, PathBuf)> {
         .output()
         .unwrap();
 
-    check_output!(build);
+    check_output!("cargo build", build);
 
     let mut examples = Vec::new();
 
@@ -133,13 +133,14 @@ fn check_examples() {
             .env(TEST_FILE_VAR, &path)
             .stdin(Stdio::null())
             .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
             .arg(&test_runner)
             .spawn()
             .unwrap();
 
         // Wait until the script is done.
         let output = bash.wait_with_output().unwrap();
-        check_output!(output);
+        check_output!(path, output);
 
         // Capture output and compare with the expected one.
         //

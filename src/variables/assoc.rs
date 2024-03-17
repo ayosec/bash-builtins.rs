@@ -106,8 +106,8 @@ impl Iterator for AssocItemsIterator<'_> {
             if !bucket.is_null() {
                 unsafe {
                     let bucket = &*bucket;
-                    let item = ((*bucket).key, (*bucket).data);
-                    self.current_bucket_item = Some((*bucket).next);
+                    let item = (bucket.key, bucket.data);
+                    self.current_bucket_item = Some(bucket.next);
                     return Some(item);
                 }
             }

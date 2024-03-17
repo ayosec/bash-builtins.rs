@@ -130,7 +130,7 @@ pub(super) fn bind_dynvar(
     let name = CString::new(name).map_err(|_| VariableError::InvalidName)?;
 
     unsafe {
-        let mut shell_var = ffi::bind_variable(name.as_ptr(), std::ptr::null(), 0);
+        let shell_var = ffi::bind_variable(name.as_ptr(), std::ptr::null(), 0);
 
         if shell_var.is_null() {
             return Err(VariableError::InvalidName);

@@ -1,8 +1,8 @@
 RED = "1"
 GREEN = "green"
-BLUE[0] = "A"
-BLUE[1] = "B"
-BLUE[2] = "C"
+BLUE[0] = (0, "A")
+BLUE[1] = (1, "B")
+BLUE[2] = (2, "C")
 YELLOW["AAB"] = "001"
 YELLOW["AAC"] = "002"
 YELLOW["AAD"] = "003"

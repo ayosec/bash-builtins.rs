@@ -47,8 +47,6 @@ extern "C" {
     pub(crate) static mut list_optopt: c_int;
     pub(crate) static mut loptend: *const WordList;
 
-    pub(crate) fn shell_version_string() -> *const c_char;
-
     pub(crate) fn internal_getopt(_: *const WordList, _: *const c_char) -> c_int;
     pub(crate) fn reset_internal_getopt();
 
@@ -65,7 +63,7 @@ extern "C" {
 
 pub(crate) mod variables {
     use super::WordList;
-    use std::os::raw::{c_char, c_int, c_uint};
+    use std::os::raw::{c_char, c_int, c_uint, c_void};
 
     // Flags for the `attributes` field.
     pub const ATT_ARRAY: c_int = 0x0000004;
@@ -93,21 +91,14 @@ pub(crate) mod variables {
 
     // Arrays.
 
-    #[repr(C)]
-    pub struct Array {
-        pub atype: c_int,
-        pub max_index: libc::intmax_t,
-        pub num_elements: c_int,
-        pub head: *const ArrayElement,
-        pub lastref: *const ArrayElement,
-    }
+    type ArrayElementMapFn = unsafe extern "C" fn(*mut ArrayElement, *mut c_void) -> c_int;
+
+    pub type ArrayPtr = *const c_char;
 
     #[repr(C)]
     pub struct ArrayElement {
         pub ind: libc::intmax_t,
         pub value: *const c_char,
-        pub next: *const ArrayElement,
-        pub prev: *const ArrayElement,
     }
 
     // Associative arrays.
@@ -130,6 +121,8 @@ pub(crate) mod variables {
     extern "C" {
         pub fn find_variable(_: *const c_char) -> *mut ShellVar;
         pub fn legal_identifier(_: *const c_char) -> c_int;
+
+        pub fn array_walk(_: ArrayPtr, _: ArrayElementMapFn, _: *const c_void);
 
         pub fn bind_variable(_: *const c_char, _: *const c_char, _: c_int) -> *mut ShellVar;
         pub fn unbind_variable(_: *const c_char) -> c_int;

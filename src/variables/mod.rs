@@ -227,7 +227,10 @@ pub enum Variable {
     Str(CString),
 
     /// An indexed [array](https://www.gnu.org/software/bash/manual/html_node/Arrays.html).
-    Array(Vec<CString>),
+    ///
+    /// Each element is a tuple with the index and the value of the items in
+    /// the array.
+    Array(Vec<(i64, CString)>),
 
     /// An associative [array](https://www.gnu.org/software/bash/manual/html_node/Arrays.html).
     ///
@@ -281,8 +284,7 @@ impl RawVariable {
             let items = self.assoc_items().map(|(k, v)| (cstr(k), cstr(v)));
             Variable::Assoc(items.collect())
         } else if self.is_array() {
-            let items = self.array_items().map(|(_, s)| cstr(s));
-            Variable::Array(items.collect())
+            Variable::Array(self.array_items())
         } else {
             Variable::Str(cstr(self.0.as_ref().value))
         }
@@ -308,8 +310,10 @@ impl RawVariable {
         }
     }
 
-    /// Returns an iterator over items of the indexed array contained in the
+    /// Returns a vector with the items of the indexed array contained in the
     /// variable.
+    ///
+    /// Each item in the vector is the index of the array and its value.
     ///
     /// # Safety
     ///
@@ -318,9 +322,8 @@ impl RawVariable {
     /// * It does not check that the address of the shell variable is still
     ///   valid.
     /// * It does not check that the shell variable contains an indexed array.
-    pub unsafe fn array_items(&self) -> impl Iterator<Item = (libc::intmax_t, *const c_char)> + '_ {
-        let array = &*(self.0.as_ref().value as *const ffi::Array);
-        arrays::ArrayItemsIterator::new(array)
+    pub unsafe fn array_items(&self) -> Vec<(i64, CString)> {
+        arrays::array_items(self.0.as_ref())
     }
 
     /// Returns an iterator over items of the associative array contained in
