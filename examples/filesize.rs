@@ -49,7 +49,7 @@ impl Builtin for FileSize {
         let mut result = Ok(());
 
         for path in args.path_arguments() {
-            match fs::metadata(&path) {
+            match fs::metadata(path) {
                 Ok(m) => {
                     writeln!(&mut output, "{}\t{}", m.len() / scale, path.display())?;
                 }

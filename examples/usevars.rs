@@ -20,11 +20,8 @@ impl Builtin for UseVars {
                 (Some(name), None) => {
                     if name.contains('[') {
                         get_array(name)?;
-                    } else {
-                        match variables::find(name) {
-                            Some(var) => write_var(&mut output, name, var)?,
-                            None => (),
-                        }
+                    } else if let Some(var) = variables::find(name) {
+                        write_var(&mut output, name, var)?
                     }
                 }
 

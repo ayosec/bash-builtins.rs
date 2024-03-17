@@ -32,7 +32,7 @@ fn build_examples() -> Vec<(String, PathBuf)> {
         .arg("build")
         .arg("--quiet")
         .arg("--examples")
-        .args(&["--message-format", "json"])
+        .args(["--message-format", "json"])
         .output()
         .unwrap();
 
