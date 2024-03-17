@@ -67,7 +67,7 @@ pub(crate) fn macro_impl(args: TokenStream) -> TokenStream {
     };
 
     let long_doc = match args.long_doc.as_ref() {
-        Some(s) => strings::to_c_arrays(&s.value()),
+        Some(s) => strings::to_long_doc(&s.value()),
 
         None => {
             quote! {
@@ -280,6 +280,9 @@ mod strings {
 
     use quote::quote;
 
+    /// Indentation level for `long_doc` strings.
+    const DOC_INDENT: usize = 4;
+
     /// Convert a string literal to its C-string equivalent.
     ///
     /// The value can't contain a NULL character.
@@ -291,10 +294,11 @@ mod strings {
         quote! { concat!(#text, "\0").as_ptr().cast() }
     }
 
-    /// Convert a string to an array of C strings.
+    /// Convert a string to the format expected in the `long_doc` field:
     ///
-    /// The left margin used to indent the text in the source code is removed.
-    pub(crate) fn to_c_arrays(text: &str) -> proc_macro2::TokenStream {
+    /// - The left margin used to indent the text in the source code is removed.
+    /// - `DOC_INDENT` spaces are prepended after the first line.
+    pub(crate) fn to_long_doc(text: &str) -> proc_macro2::TokenStream {
         let text = text.trim_start_matches('\n').trim_end();
 
         let left_margin = text
@@ -304,13 +308,25 @@ mod strings {
             .min()
             .unwrap_or_default();
 
-        let lines = text
-            .lines()
-            .map(|line| to_cstr(line.get(left_margin..).unwrap_or_default()));
+        let mut doc = String::with_capacity(text.len());
+
+        let prepend = format!("\n{:1$}", ' ', DOC_INDENT);
+
+        for line in text.lines() {
+            if !doc.is_empty() {
+                doc.push_str(&prepend);
+            }
+
+            if let Some(line) = line.get(left_margin..) {
+                doc.push_str(line);
+            }
+        }
+
+        let lines = to_cstr(&doc);
 
         quote! {
             (&[
-                #(#lines,)*
+                #lines,
                 ::std::ptr::null()
             ]).as_ptr()
         }
