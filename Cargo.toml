@@ -1,6 +1,6 @@
 [package]
 name = "bash-builtins"
-version = "0.3.1"
+version = "0.4.0"
 edition = "2018"
 authors = [ "ayosec@gmail.com" ]
 description = "This crate provides utilities to implement loadable builtins for bash."
@@ -12,7 +12,7 @@ keywords = ["bash"]
 
 [dependencies]
 libc = "0"
-bash_builtins_macro = { version = "0", path = "bash_builtins_macro" }
+bash_builtins_macro = { version = "0.2.0", path = "bash_builtins_macro" }
 
 [dev-dependencies]
 assert_matches = "1"

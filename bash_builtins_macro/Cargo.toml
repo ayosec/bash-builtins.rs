@@ -1,6 +1,6 @@
 [package]
 name = "bash_builtins_macro"
-version = "0.1.1"
+version = "0.2.0"
 edition = "2018"
 authors = [ "ayosec@gmail.com" ]
 description = "Macros for the bash-builtins crate"
