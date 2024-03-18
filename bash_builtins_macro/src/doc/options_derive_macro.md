@@ -61,8 +61,12 @@ impl Builtin for Foo {
 Options can have one argument. The value for that argument is taken from the
 next word in the command-line.
 
+If the type of the argument is an [`Option<T>`], then the option can be used
+without an argument. Bash assumes a missing argument if the option is the last
+argument of the command-line, or the next argument starts with a hyphen.
+
 For example, if the builtin defined in the [previous example](#example) is
-executed with:
+executed with the following arguments:
 
 ```notrust
 $ foo -l 100 -w -w name
@@ -87,23 +91,16 @@ In the [previous example](#example), the variant `Opt::Limit` is associated with
 the option `-l`, and it requires an argument of type `u16`. If the argument is
 missing when the builtin is invoked, or its value can't be converted to `u16`,
 then an error is printed to *stderr*, and the `args.options()` iterator yields
-an error. This error is propagated to the caller in the `match opt?` line.
-
-# Non-Required Arguments
-
-If the type of the argument is an [`Option<T>`], then the option can be used
-without an argument.
-
-Bash assumes a missing argument if the option is the last argument of the
-command-line, or the next argument starts with a hyphen.
+an error. This error is propagated to the caller in the `match opt?` line of
+the example.
 
 # Using References
 
 For [`str`], [`Path`](std::path::Path), and [`OsStr`](std::ffi::OsStr), it is
 possible to get a reference instead of an owned value. Its lifetime is bound to
-the `&mut Args` variable received as an argument of the `call` method, so it is
-possible to use it inside the method, but the value needs to be cloned if it is
-stored for future builtin invocations.
+the `&mut Args` variable received as an argument of the `call` function, so it
+is possible to use it inside the function, but the value needs to be cloned if
+it is stored for future calls.
 
 [`Args::options`]: struct.Args.html#method.options
 [`Option<T>`]: std::option::Option

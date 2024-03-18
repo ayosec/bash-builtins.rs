@@ -160,7 +160,7 @@
 //! [`try_create`] is executed. This function will create a new instance of a
 //! type that implements the [`Builtin`] trait.
 //!
-//! [`try_create`] is used if the initialization mail fails.
+//! [`try_create`] must be used if the initialization can fail.
 //!
 //! ## Example of a Fallible Initialization
 //!
@@ -204,6 +204,8 @@
 //! If a builtin needs to run any cleanup process when it is unloaded, then it
 //! must implement [`Drop`](std::ops::Drop). The value is dropped just before
 //! the builtin is deleted.
+//!
+//! The destructor is not executed when the Bash process exits.
 //!
 //! # Parsing Command Line Options
 //!
